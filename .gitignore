@@ -75,7 +75,7 @@ screenshot
 sessionStore
 
 # pdm
-sql/ruoyi-office/.back_ruoyi-office
+script/sql/ruoyi-office/.back_ruoyi-office
 
 # local runtime & tool caches
 /.tmp/

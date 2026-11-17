@@ -37,23 +37,22 @@ pay / mp / product / promotion / trade / statistics / crm / erp / ai / iot），
 | --- | --- |
 | JDK | 21.0.12（Corretto），项目 `java.version=17`，可用 |
 | Maven | `${HOME}/.m2/wrapper/dists/apache-maven-3.9.12/`（项目未带 mvnw） |
-| Maven 本地仓库 | `.m2repo`（沙盒内副本，`~/.m2/repository` 不可写） |
+| Maven 本地仓库 | `~/.m2/repository`（若存在 `.m2repo` 则优先使用） |
 | Node | v22.23.4（nvm） |
-| pnpm | 10.28.2，由 corepack 安装到 `.corepack`（`~/.cache` 不可写） |
-| pnpm store | `.pnpm-store` |
+| pnpm | 10.28.2，由 corepack 管理（`~/.cache/node/corepack` 或 `.corepack`） |
+| pnpm store | `~/.pnpm-store`（由 pnpm 自动管理） |
 
 ## 数据库初始化
 
-当前 HEAD 的 `sql/mysql/ruoyi-vue-pro.sql` 只含 48 张表（system/infra/demo），
+当前 HEAD 的 `script/sql/mysql/ruoyi-vue-pro.sql` 只含 48 张表（system/infra/demo），
 不含 oa/hrm/crm/erp/wms/asset/bpm/iot/ai/pay/mall 等业务表。
 
-因此基础数据取自历史提交 `a6424828b` 中的全量备份（282 张表）：
+基础表结构与增量脚本位于 `script/sql/mysql/`（如需额外建表与调度表）：
 
 ```bash
-git -C ruoyi-office show a6424828b:sql/mysql/dump-ruoyi-office-20260305.sql > full-dump.sql
 docker exec -i mysql mysql -uroot -proot -e "CREATE DATABASE \`ruoyi-office\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-docker exec -i mysql mysql -uroot -proot ruoyi-office < full-dump.sql
-docker exec -i mysql mysql -uroot -proot ruoyi-office < ruoyi-office/sql/mysql/quartz.sql
+docker exec -i mysql mysql -uroot -proot ruoyi-office < script/sql/mysql/ruoyi-vue-pro.sql
+docker exec -i mysql mysql -uroot -proot ruoyi-office < script/sql/mysql/quartz.sql
 ```
 
 导出文件末尾有一句把 `sql_mode` 还原为 `NO_AUTO_CREATE_USER` 的语句（MySQL 5.7 产物），
@@ -103,7 +102,9 @@ ALTER TABLE <table> ADD COLUMN tenant_id bigint NOT NULL DEFAULT 0;
 `PermissionCommonApi` 缺失）：
 
 ```bash
-mvn -P boot -Dmaven.repo.local=.m2repo -Dmaven.test.skip=true clean package
+./dev.sh build
+# 或直接执行：
+mvn -P boot -Dmaven.test.skip=true clean package
 ```
 
 ## 已知限制

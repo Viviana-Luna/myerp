@@ -6,15 +6,23 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-BACKEND_DIR="$ROOT/ruoyi-office"
+BACKEND_DIR="$ROOT"
 FRONTEND_DIR="$ROOT/ruoyi-office-vben"
 RUN_DIR="$ROOT/.tmp"
 
 JAVA_HOME="${JAVA_HOME:-/Users/luna/Library/Java/JavaVirtualMachines/corretto-21.0.12/Contents/Home}"
-MAVEN="$HOME/.m2/wrapper/dists/apache-maven-3.9.12/57e1dc81/bin/mvn"
+MAVEN="${MAVEN:-$(command -v mvn 2>/dev/null || echo "$HOME/.m2/wrapper/dists/apache-maven-3.9.12/57e1dc81/bin/mvn")}"
 NODE_BIN="$HOME/.nvm/versions/node/v22.23.4/bin"
-MAVEN_REPO="$ROOT/.m2repo"
-COREPACK_HOME="$ROOT/.corepack"
+if [ -d "$ROOT/.m2repo" ]; then
+  MAVEN_REPO="$ROOT/.m2repo"
+else
+  MAVEN_REPO="${MAVEN_REPO:-$HOME/.m2/repository}"
+fi
+if [ -d "$ROOT/.corepack" ]; then
+  COREPACK_HOME="$ROOT/.corepack"
+else
+  COREPACK_HOME="${COREPACK_HOME:-$HOME/.cache/node/corepack}"
+fi
 
 BACKEND_LOG="$RUN_DIR/logs/yudao-server.log"
 BACKEND_STDOUT="$RUN_DIR/backend.log"
@@ -56,7 +64,17 @@ build() {
 
 stop() {
   pkill -f "yudao-server.jar" 2>/dev/null && echo "后端已停止" || echo "后端未在运行"
-  pkill -f "apps/web-antd.*vite" 2>/dev/null && echo "前端已停止" || echo "前端未在运行"
+  if pkill -f "apps/web-antd.*vite" 2>/dev/null; then
+    echo "前端已停止"
+  else
+    local vite_pids
+    vite_pids="$(lsof -tiTCP:5666 -sTCP:LISTEN 2>/dev/null || true)"
+    if [ -n "$vite_pids" ]; then
+      kill $vite_pids 2>/dev/null && echo "前端已停止" || echo "前端未在运行"
+    else
+      echo "前端未在运行"
+    fi
+  fi
 }
 
 status() {

@@ -1,0 +1,43 @@
+{
+  "name": "@vben/node-utils",
+  "version": "5.6.0",
+  "private": true,
+  "homepage": "https://github.com/Viviana-Luna/myerp",
+  "bugs": "https://github.com/Viviana-Luna/myerp/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Viviana-Luna/myerp.git",
+    "directory": "ruoyi-office-vben/internal/node-utils"
+  },
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "stub": "pnpm unbuild --stub"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@changesets/git": "catalog:",
+    "@manypkg/get-packages": "catalog:",
+    "chalk": "catalog:",
+    "consola": "catalog:",
+    "dayjs": "catalog:",
+    "execa": "catalog:",
+    "find-up": "catalog:",
+    "ora": "catalog:",
+    "pkg-types": "catalog:",
+    "prettier": "catalog:",
+    "rimraf": "catalog:"
+  }
+}

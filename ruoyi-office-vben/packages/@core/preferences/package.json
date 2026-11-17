@@ -1,0 +1,37 @@
+{
+  "name": "@vben-core/preferences",
+  "version": "5.6.0",
+  "homepage": "https://github.com/Viviana-Luna/myerp",
+  "bugs": "https://github.com/Viviana-Luna/myerp/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Viviana-Luna/myerp.git",
+    "directory": "ruoyi-office-vben/packages/@core/preferences"
+  },
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "#build": "pnpm unbuild"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "default": "./src/index.ts",
+      "#default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@vben-core/shared": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "@vueuse/core": "catalog:",
+    "vue": "catalog:"
+  }
+}

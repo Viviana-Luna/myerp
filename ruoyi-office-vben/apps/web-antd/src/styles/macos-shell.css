@@ -1,0 +1,329 @@
+/* =========================================================
+ * macOS Desktop Shell（桌面壁纸 + 悬浮应用窗口 + 磨砂侧栏）
+ * ========================================================= */
+
+/* 兼容保留导航图标显示开关 */
+body[data-navigation-show-icon='false'] .vben-menu .vben-menu__icon,
+body[data-navigation-show-icon='false'] .vben-normal-menu__icon,
+body[data-navigation-show-icon='false'] .vben-mixed-menu .vben-menu__icon,
+body[data-navigation-show-icon='false'] .vben-sub-menu .vben-menu__icon,
+body.hide-menu-icons .vben-menu .vben-menu__icon,
+body.hide-menu-icons .vben-normal-menu__icon,
+body.hide-menu-icons .vben-mixed-menu .vben-menu__icon,
+body.hide-menu-icons .vben-sub-menu .vben-menu__icon {
+  display: none !important;
+}
+
+body[data-navigation-show-icon='false'] .vben-menu .vben-menu__item {
+  padding-left: 16px !important;
+}
+
+.macos-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- 精选 Apple 风格壁纸 ---------- */
+
+.macos-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: background 420ms ease;
+}
+
+/* Sequoia 晨光（默认） */
+.macos-shell[data-wallpaper='sequoia'] .macos-wallpaper {
+  background:
+    radial-gradient(
+      65% 52% at 14% 12%,
+      rgb(125 162 255 / 55%),
+      transparent 64%
+    ),
+    radial-gradient(
+      58% 48% at 88% 10%,
+      rgb(244 166 205 / 52%),
+      transparent 62%
+    ),
+    radial-gradient(
+      68% 58% at 78% 92%,
+      rgb(103 224 232 / 52%),
+      transparent 65%
+    ),
+    radial-gradient(
+      52% 42% at 18% 88%,
+      rgb(254 202 158 / 46%),
+      transparent 60%
+    ),
+    linear-gradient(155deg, #e7efff 0%, #eff2ff 48%, #f8edf8 100%);
+}
+
+.dark .macos-shell[data-wallpaper='sequoia'] .macos-wallpaper {
+  background:
+    radial-gradient(62% 50% at 12% 10%, rgb(67 97 238 / 42%), transparent 64%),
+    radial-gradient(56% 46% at 88% 14%, rgb(168 85 247 / 32%), transparent 64%),
+    radial-gradient(65% 54% at 76% 94%, rgb(20 184 166 / 30%), transparent 65%),
+    linear-gradient(160deg, #0b1120 0%, #131932 52%, #1b1630 100%);
+}
+
+/* Tahoe 蔚蓝 */
+.macos-shell[data-wallpaper='tahoe'] .macos-wallpaper {
+  background:
+    radial-gradient(64% 52% at 18% 8%, rgb(56 189 248 / 58%), transparent 64%),
+    radial-gradient(60% 48% at 86% 18%, rgb(59 130 246 / 48%), transparent 64%),
+    radial-gradient(70% 56% at 62% 96%, rgb(45 212 191 / 46%), transparent 65%),
+    linear-gradient(160deg, #dff4ff 0%, #e4edff 54%, #dbeafe 100%);
+}
+
+.dark .macos-shell[data-wallpaper='tahoe'] .macos-wallpaper {
+  background:
+    radial-gradient(62% 50% at 16% 10%, rgb(14 165 233 / 36%), transparent 64%),
+    radial-gradient(58% 48% at 86% 18%, rgb(37 99 235 / 38%), transparent 64%),
+    radial-gradient(64% 52% at 62% 94%, rgb(13 148 136 / 32%), transparent 65%),
+    linear-gradient(160deg, #081226 0%, #0d1d3b 54%, #0f172a 100%);
+}
+
+/* 晴岚晨曦 */
+.macos-shell[data-wallpaper='dawn'] .macos-wallpaper {
+  background:
+    radial-gradient(
+      62% 50% at 12% 14%,
+      rgb(110 231 183 / 52%),
+      transparent 64%
+    ),
+    radial-gradient(
+      58% 46% at 88% 12%,
+      rgb(125 211 252 / 54%),
+      transparent 64%
+    ),
+    radial-gradient(
+      64% 54% at 74% 94%,
+      rgb(165 180 252 / 52%),
+      transparent 65%
+    ),
+    linear-gradient(160deg, #e8fbf4 0%, #eaf6ff 52%, #eef2ff 100%);
+}
+
+.dark .macos-shell[data-wallpaper='dawn'] .macos-wallpaper {
+  background:
+    radial-gradient(60% 48% at 12% 14%, rgb(16 185 129 / 28%), transparent 64%),
+    radial-gradient(56% 46% at 88% 14%, rgb(14 165 233 / 30%), transparent 64%),
+    radial-gradient(64% 52% at 72% 94%, rgb(99 102 241 / 30%), transparent 65%),
+    linear-gradient(160deg, #09191b 0%, #0e1e2f 52%, #131731 100%);
+}
+
+/* 极光夜幕 */
+.macos-shell[data-wallpaper='aurora'] .macos-wallpaper {
+  background:
+    radial-gradient(62% 48% at 18% 12%, rgb(52 211 153 / 42%), transparent 62%),
+    radial-gradient(
+      58% 46% at 84% 16%,
+      rgb(129 140 248 / 48%),
+      transparent 62%
+    ),
+    radial-gradient(64% 54% at 58% 94%, rgb(56 189 248 / 40%), transparent 64%),
+    linear-gradient(162deg, #101936 0%, #192449 52%, #132c3b 100%);
+}
+
+/* ---------- 舞台与窗口层 ---------- */
+
+.macos-stage {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+}
+
+/* 应用窗口态：默认铺满顶部菜单栏下方全屏区域，Dock 默认收纳于底部按需呼出 */
+.macos-window {
+  position: fixed;
+  inset: 34px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: hsl(var(--background));
+  border: 0;
+  border-radius: 0;
+}
+
+.dark .macos-window {
+  background: rgb(20 23 31);
+}
+
+/* 桌面模式：取消窗口底色，让小组件直接铺在壁纸上 */
+.macos-shell.is-desktop .macos-window {
+  inset: 34px 0 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.macos-window__body {
+  position: relative;
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 让 VbenAdminLayout 根容器贴合窗口内部大小 */
+.macos-window__body > div {
+  flex: 1 1 0%;
+  height: 100%;
+  min-height: 0 !important;
+}
+
+/* 把 Vben 内置的 fixed 侧栏与 headerWrapper 纳入窗口内部流式布局，不修改 packages/ */
+.macos-window__body > div > div:has(+ aside) {
+  display: none !important;
+}
+
+.macos-window__body > div > aside {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 5 !important;
+  flex-shrink: 0;
+  height: 100% !important;
+  background: rgb(246 248 252 / 72%) !important;
+  border-right: 1px solid hsl(var(--border) / 70%) !important;
+  backdrop-filter: blur(22px) saturate(160%);
+}
+
+.dark .macos-window__body > div > aside {
+  background: rgb(26 29 38 / 78%) !important;
+  border-right-color: rgb(255 255 255 / 9%) !important;
+}
+
+/* 左侧菜单 macOS Finder 质感 */
+.macos-window__body > div > aside .vben-menu {
+  --menu-background-color: transparent;
+  --menu-submenu-background-color: transparent;
+  --menu-item-background-color: transparent;
+  --menu-item-radius: 9px;
+  --menu-item-margin-x: 8px;
+  --menu-item-margin-y: 2px;
+  --menu-item-height: 36px;
+}
+
+.macos-window__body > div > aside .vben-menu .vben-menu__item.is-active {
+  font-weight: 600;
+  color: hsl(var(--primary));
+  background: hsl(var(--primary) / 11%);
+}
+
+.macos-window__body > div > aside .vben-menu .vben-sub-menu__title:hover,
+.macos-window__body > div > aside .vben-menu .vben-menu__item:hover {
+  background: hsl(var(--accent) / 80%);
+}
+
+/* 右侧主区 */
+.macos-window__body > div > div.flex-1 {
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+/* stylelint-disable selector-id-pattern */
+
+/* 隐藏 BasicLayout 自带的 0px header/tabbar 包装容器（仍保持组件挂载以维持 keep-alive 与 tabbarStore 同步） */
+.macos-window__body
+  > div
+  > div.flex-1
+  > div:first-child:not(#__vben_main_content) {
+  display: none !important;
+}
+
+.macos-window__body #__vben_main_content {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  margin-top: 0 !important;
+  overflow: hidden auto;
+  background: hsl(var(--background-deep)) !important;
+}
+/* stylelint-enable selector-id-pattern */
+
+/* 为侧边栏底部的「程序坞」按钮与折叠栏留出空间，避免长菜单压住按钮 */
+.macos-window__body > div > aside .vben-scrollbar {
+  height: calc(100% - 86px) !important;
+}
+
+.macos-sidebar-dock-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 44px;
+  left: 12px;
+  z-index: 12;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--foreground) / 82%);
+  cursor: pointer;
+  background: hsl(var(--accent) / 72%);
+  border: 1px solid hsl(var(--border) / 75%);
+  border-radius: 9px;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.macos-sidebar-dock-btn:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--accent));
+  border-color: hsl(var(--border));
+}
+
+.macos-sidebar-dock-btn.is-active {
+  color: #fff;
+  background: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  box-shadow: 0 6px 14px -6px hsl(var(--primary) / 55%);
+}
+
+.macos-sidebar-dock-btn.is-collapsed {
+  padding: 0;
+}
+
+.macos-sidebar-dock-btn__icon {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+}
+
+.macos-sidebar-dock-btn__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 桌面模式下完全隐藏侧栏，并将内容背景改为完全透明 */
+.macos-shell.is-desktop .macos-window__body > div > aside {
+  display: none !important;
+}
+
+/* stylelint-disable selector-id-pattern */
+.macos-shell.is-desktop .macos-window__body #__vben_main_content {
+  overflow: hidden !important;
+  background: transparent !important;
+}
+/* stylelint-enable selector-id-pattern */
+
+@media (max-width: 768px) {
+  .macos-window {
+    inset: 34px 0 0;
+    border-width: 0;
+    border-radius: 0;
+  }
+}
